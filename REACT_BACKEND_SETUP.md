@@ -49,5 +49,4 @@ Open app
 - Backend docs: http://127.0.0.1:8000/docs
 
 Notes
-- Existing Streamlit app is untouched and still runnable.
 - Frontend is fully React and reads all dashboard/prediction data from the Python backend APIs.

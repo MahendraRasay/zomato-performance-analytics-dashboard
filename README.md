@@ -47,18 +47,3 @@ npm run dev
 ## URLs
 - Frontend: http://127.0.0.1:5173
 - Backend docs: http://127.0.0.1:8000/docs
-
-## Legacy Streamlit (Optional)
-Streamlit files are preserved (app.py, ui.py) but are not part of the default workflow.
-
-Install optional Streamlit dependencies:
-
-```powershell
-pip install -r requirements.streamlit.txt
-```
-
-Run Streamlit app:
-
-```powershell
-& ".\.venv\Scripts\python.exe" -m streamlit run app.py
-```

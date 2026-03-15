@@ -1,5 +1,4 @@
 # Default Python dependencies for the FastAPI backend.
-# Streamlit dependencies are in requirements.streamlit.txt.
 
 fastapi==0.115.8
 uvicorn==0.34.0
