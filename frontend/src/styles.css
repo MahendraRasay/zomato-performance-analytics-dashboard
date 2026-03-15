@@ -407,6 +407,12 @@ body {
   transition: all 0.2s ease;
 }
 
+.charts .confusion-matrix-card {
+  grid-column: 1 / -1;
+  width: min(100%, 860px);
+  justify-self: center;
+}
+
 .charts section:hover {
   box-shadow: 0 4px 8px var(--corporate-shadow-lg);
 }

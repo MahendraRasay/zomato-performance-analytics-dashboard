@@ -922,7 +922,7 @@ function App() {
               <div className="charts">
                 <section><h3>Feature Importance (Regression)</h3><Plot data={[{ x: predictiveAssets.reg_importances.map((d) => readNum(d, "importance")), y: predictiveAssets.reg_importances.map((d) => readStr(d, "feature")), type: "bar", orientation: "h" }]} layout={{ margin: { l: 180, r: 20, t: 10, b: 40 } }} style={{ width: "100%", height: 360 }} config={{ displayModeBar: false, responsive: true }} /></section>
                 <section><h3>Feature Importance (Classification)</h3><Plot data={[{ x: predictiveAssets.cls_importances.map((d) => readNum(d, "importance")), y: predictiveAssets.cls_importances.map((d) => readStr(d, "feature")), type: "bar", orientation: "h" }]} layout={{ margin: { l: 180, r: 20, t: 10, b: 40 } }} style={{ width: "100%", height: 360 }} config={{ displayModeBar: false, responsive: true }} /></section>
-                <section>
+                <section className="confusion-matrix-card">
                   <h3>Confusion Matrix</h3>
                   <Plot
                     data={[
