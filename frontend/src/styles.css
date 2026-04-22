@@ -451,12 +451,39 @@ body {
   border-color: var(--corporate-navy);
   padding: 12px 20px;
   font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
 .pred-form button:hover {
   background: var(--corporate-blue);
   border-color: var(--corporate-blue);
   color: #ffffff;
+}
+
+.pred-form button:disabled,
+.pred-form button.is-loading {
+  cursor: wait;
+  opacity: 0.88;
+  box-shadow: none;
+}
+
+.button-spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  animation: spin 0.8s linear infinite;
+  flex: 0 0 auto;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .table-section {

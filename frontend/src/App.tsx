@@ -346,6 +346,8 @@ function toggleValue(current: string[], value: string): string[] {
   return current.includes(value) ? current.filter((item) => item !== value) : [...current, value];
 }
 
+type PredictionStatus = "idle" | "uploading" | "processing" | "generating";
+
 function App() {
   const [options, setOptions] = useState<FilterOptions | null>(null);
   const [loading, setLoading] = useState(true);
@@ -367,10 +369,12 @@ function App() {
   const [predictiveAssets, setPredictiveAssets] = useState<PredictiveAssetsResponse | null>(null);
 
   const [prediction, setPrediction] = useState<{ time: number; delay: number } | null>(null);
+  const [predictionStatus, setPredictionStatus] = useState<PredictionStatus>("idle");
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
   const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
   const [isWeatherDropdownOpen, setIsWeatherDropdownOpen] = useState(false);
   const [isTrafficDropdownOpen, setIsTrafficDropdownOpen] = useState(false);
+  const predictionStatusTimers = useRef<number[]>([]);
   const cityDropdownRef = useRef<HTMLDivElement | null>(null);
   const weatherDropdownRef = useRef<HTMLDivElement | null>(null);
   const trafficDropdownRef = useRef<HTMLDivElement | null>(null);
@@ -454,8 +458,6 @@ function App() {
           setDemandTimeData(await getDemandTime(filters));
         } else if (page === "External Impact Analysis") {
           setExternalImpact(await getExternalImpact(filters));
-        } else if (page === "Location Intelligence") {
-          setLocationIntel(await getLocationIntelligence(filters));
         } else if (page === "Predictive Analytics") {
           const assets = await getPredictiveAssets(filters);
           setPredictiveAssets(assets);
@@ -483,6 +485,22 @@ function App() {
   }, [options, filters, page]);
 
   useEffect(() => {
+    if (!options || page === "Location Intelligence") {
+      return;
+    }
+
+    const run = async () => {
+      try {
+        setLocationIntel(await getLocationIntelligence(filters));
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load location intelligence");
+      }
+    };
+
+    run();
+  }, [options, filters, page]);
+
+  useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
       if (cityDropdownRef.current && !cityDropdownRef.current.contains(event.target as Node)) {
         setIsCityDropdownOpen(false);
@@ -503,14 +521,51 @@ function App() {
     };
   }, []);
 
+  useEffect(() => {
+    return () => {
+      predictionStatusTimers.current.forEach((timerId) => window.clearTimeout(timerId));
+      predictionStatusTimers.current = [];
+    };
+  }, []);
+
+  const clearPredictionStatusTimers = () => {
+    predictionStatusTimers.current.forEach((timerId) => window.clearTimeout(timerId));
+    predictionStatusTimers.current = [];
+  };
+
+  const queuePredictionStatusChange = (delay: number, status: PredictionStatus) => {
+    const timerId = window.setTimeout(() => {
+      setPredictionStatus(status);
+    }, delay);
+
+    predictionStatusTimers.current.push(timerId);
+  };
+
   const runPrediction = async () => {
     try {
+      clearPredictionStatusTimers();
+      setPredictionStatus("uploading");
+      queuePredictionStatusChange(700, "processing");
+      queuePredictionStatusChange(1500, "generating");
+
       const result = await predictDelivery(predForm);
+      clearPredictionStatusTimers();
+      setPredictionStatus("idle");
       setPrediction({ time: result.predicted_delivery_time, delay: result.delay_probability });
     } catch (err) {
+      clearPredictionStatusTimers();
+      setPredictionStatus("idle");
       setError(err instanceof Error ? err.message : "Prediction failed");
     }
   };
+
+  const predictionButtonLabel = predictionStatus === "uploading"
+    ? "Uploading..."
+    : predictionStatus === "processing"
+      ? "Processing..."
+      : predictionStatus === "generating"
+        ? "Generating Insights..."
+        : "Predict Delivery";
 
   return (
     <div className="page">
@@ -916,7 +971,10 @@ function App() {
                 <label className="pred-field">Type of Vehicle
                   <select value={String(predForm.type_of_vehicle)} onChange={(e) => setPredForm((p) => ({ ...p, type_of_vehicle: e.target.value }))}>{predictiveAssets.options.type_of_vehicle.map((o) => <option key={o} value={o}>{o}</option>)}</select>
                 </label>
-                <button type="button" onClick={runPrediction}>Predict Delivery</button>
+                <button type="button" className={predictionStatus !== "idle" ? "is-loading" : undefined} onClick={runPrediction} disabled={predictionStatus !== "idle"} aria-busy={predictionStatus !== "idle"}>
+                  {predictionStatus !== "idle" && <span className="button-spinner" aria-hidden="true" />}
+                  <span>{predictionButtonLabel}</span>
+                </button>
               </div>
 
               <div className="charts">
