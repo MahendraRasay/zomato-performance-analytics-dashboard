@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import pandas as pd
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from .core import (
+from core import (
     demand_time_payload,
     delivery_operations_payload,
     external_impact_payload,
@@ -18,16 +19,22 @@ from .core import (
     rider_efficiency_payload,
     train_predictive_models,
 )
-from .schemas import FiltersRequest, PredictionRequest
+from schemas import FiltersRequest, PredictionRequest
 
-BASE_DIR = Path(__file__).resolve().parents[2]
+BASE_DIR = Path(__file__).resolve().parents[1]
 DATA_PATH = BASE_DIR / "Zomato Dataset.csv"
 
 app = FastAPI(title="Zomato Delivery API", version="1.0.0")
 
+cors_origins = [
+    origin.strip()
+    for origin in os.getenv("CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(",")
+    if origin.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
