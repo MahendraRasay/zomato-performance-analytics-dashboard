@@ -1,9 +1,9 @@
 React Frontend + FastAPI Backend Setup
 
 What was added
-- backend/app/main.py: FastAPI server and full analytics/prediction API endpoints.
-- backend/app/core.py: data prep, filtering, page payloads, and model logic extracted from Streamlit flow.
-- backend/app/schemas.py: request models.
+- backend/main.py: FastAPI server and full analytics/prediction API endpoints.
+- backend/core.py: data prep, filtering, page payloads, and model logic extracted from Streamlit flow.
+- backend/schemas.py: request models.
 - backend/requirements.txt: backend dependencies.
 - frontend/: React + TypeScript app scaffold.
 - frontend/src/App.tsx: full migrated multi-page React dashboard wired to API.
@@ -35,7 +35,7 @@ Run backend
 1) Open terminal in workspace root.
 2) Run:
    Set-Location "backend"
-   & "../.venv/Scripts/python.exe" -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+   & "../.venv/Scripts/python.exe" -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload
 
 Run frontend
 1) Open another terminal in workspace root.
